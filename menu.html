@@ -929,7 +929,7 @@
       }
     });
 
-    document.addEventListener('drop', (e) => {
+    document.addEventListener('drop', async (e) => {
       e.preventDefault();
       dragCounter = 0;
       dragOverlay.classList.remove('active');
@@ -938,23 +938,25 @@
       if (files && files.length > 0) {
         for (let i = 0; i < files.length; i++) {
           const file = files[i];
-          const ext = path.extname(file.path || '').toLowerCase();
+          const fileName = file.name || 'character.gif';
+          const ext = path.extname(fileName).toLowerCase();
+          
           if (ext === '.gif' || ext === '.png') {
-            const dest = path.join(charsDir, path.basename(file.path));
             try {
-              fs.copyFileSync(file.path, dest);
-              // Tell main process to also reload characters if needed, or just refresh menu
-              ipcRenderer.send('add-character-success'); // optional
+              const dest = path.join(charsDir, fileName);
+              // Use standard Web API to read file data
+              const arrayBuffer = await file.arrayBuffer();
+              const buffer = Buffer.from(arrayBuffer);
+              fs.writeFileSync(dest, buffer);
+              
             } catch (err) {
-              alert("Error copying dropped file: " + err.message + "\\nPath: " + file.path);
+              alert("Error saving dropped file: " + err.message);
             }
           } else {
-            alert("File is not a gif or png: " + (file.path || file.name));
+            alert("File is not a gif or png: " + fileName);
           }
         }
         loadGrid();
-      } else {
-        alert("No files found in drop event.");
       }
     });
   </script>
