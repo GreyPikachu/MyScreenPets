@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Desktop Pet</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="pet-container" id="pet-container">
+    <!-- Wrapper to keep UI elements tight to the sprite's size -->
+    <div id="sprite-wrapper">
+      <!-- Ground shadow -->
+      <div id="ground-shadow" class="ground-shadow"></div>
+      <!-- Interactive Pet Sprite -->
+      <img id="pet-sprite" src="assets/idle.svg" alt="pet" draggable="false">
+
+      <!-- Emotion particle placeholders -->
+      <div id="particles"></div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

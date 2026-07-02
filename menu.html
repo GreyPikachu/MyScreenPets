@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+      color: rgba(255, 255, 255, 0.92);
+      background: transparent;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── Header ─────────────────────────────── */
+    .header {
+      -webkit-app-region: drag;
+      padding: 18px 18px 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .back-btn {
+      -webkit-app-region: no-drag;
+      width: 28px; height: 28px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.2s, transform 0.15s;
+      flex-shrink: 0;
+      margin-top: 8px;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.28); transform: scale(1.08); }
+    .header-title {
+      font-size: 14px; font-weight: 600;
+      letter-spacing: 0.3px;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.35);
+      flex: 1;
+      text-align: center;
+    }
+    .header-spacer { width: 28px; flex-shrink: 0; }
+
+    /* ─── Content ─────────────────────────────── */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 4px 16px 20px;
+    }
+    ::-webkit-scrollbar { display: none; }
+
+    /* ─── Character Grid ─────────────────────── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .char-card {
+      background: rgba(255, 255, 255, 0.13);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 18px;
+      padding: 14px 10px 10px;
+      text-align: center;
+      position: relative;
+      transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.18);
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+    }
+    .char-card:hover {
+      transform: translateY(-3px) scale(1.02);
+      background: rgba(255, 255, 255, 0.22);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.35);
+      border-color: rgba(255, 255, 255, 0.45);
+    }
+    .char-card.active-char {
+      border-color: rgba(120, 200, 255, 0.7);
+      background: rgba(100, 180, 255, 0.18);
+      box-shadow: 0 0 0 1px rgba(120,200,255,0.4), 0 8px 20px rgba(0,0,0,0.18);
+    }
+    .char-card img {
+      width: 56px; height: 56px;
+      object-fit: contain;
+      margin-bottom: 8px;
+      filter: drop-shadow(0 3px 5px rgba(0,0,0,0.2));
+    }
+    .char-name {
+      font-size: 12px; font-weight: 600;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .char-settings-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      width: 22px; height: 22px;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+      opacity: 0;
+      transition: opacity 0.2s, background 0.2s, transform 0.15s;
+      cursor: pointer;
+    }
+    .char-card:hover .char-settings-btn {
+      opacity: 1;
+    }
+    .char-settings-btn:hover {
+      background: rgba(255,255,255,0.35);
+      transform: scale(1.15) rotate(30deg);
+    }
+
+    /* ─── Add Card ───────────────────────────── */
+    .add-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1.5px dashed rgba(255, 255, 255, 0.35);
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      gap: 6px;
+      color: rgba(255,255,255,0.65);
+      min-height: 110px;
+    }
+    .add-card:hover {
+      background: rgba(255,255,255,0.13);
+      color: white; border-style: solid;
+      border-color: rgba(255,255,255,0.5);
+    }
+    .add-icon { font-size: 28px; font-weight: 300; line-height: 1; }
+
+    /* ─── Settings Panel ─────────────────────── */
+    .settings-panel {
+      display: none;
+      flex-direction: column;
+      gap: 0;
+    }
+    .settings-panel.visible { display: flex; }
+
+    .char-preview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 0 18px;
+      gap: 6px;
+    }
+    .char-preview img {
+      height: 80px; width: 80px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25));
+      transition: transform 0.3s ease;
+    }
+    .char-preview-name {
+      font-size: 15px; font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .settings-card {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 16px;
+      backdrop-filter: blur(6px);
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .setting-row {
+      display: flex;
+      align-items: center;
+      padding: 13px 15px;
+      gap: 12px;
+    }
+    .setting-row + .setting-row {
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .setting-icon {
+      font-size: 20px; width: 28px; text-align: center; flex-shrink: 0;
+    }
+    .setting-info {
+      flex: 1;
+    }
+    .setting-label {
+      font-size: 13px; font-weight: 600; margin-bottom: 2px;
+    }
+    .setting-description {
+      font-size: 11px; opacity: 0.6; line-height: 1.3;
+    }
+
+    /* Toggle Switch */
+    .toggle {
+      position: relative; width: 42px; height: 24px; flex-shrink: 0;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-track {
+      position: absolute; inset: 0;
+      background: rgba(255,255,255,0.2);
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.25);
+      cursor: pointer;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .toggle input:checked + .toggle-track {
+      background: rgba(52, 199, 89, 0.85);
+      border-color: rgba(52,199,89,0.6);
+    }
+    .toggle-thumb {
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 18px; height: 18px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+      pointer-events: none;
+    }
+    .toggle input:checked ~ .toggle-thumb {
+      transform: translateX(18px);
+    }
+
+    /* Select Dropdown */
+    .style-select {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 8px;
+      color: white;
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+    .style-select option {
+      background: #2a2a2e;
+      color: white;
+    }
+
+    /* Slider */
+    .slider-row {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 13px 15px;
+    }
+    .slider-header {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .slider-value-badge {
+      margin-left: auto;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 8px;
+      padding: 2px 8px;
+      font-size: 12px; font-weight: 700;
+      min-width: 46px; text-align: center;
+    }
+    .slider-labels {
+      display: flex; justify-content: space-between;
+      font-size: 10px; opacity: 0.5; padding: 0 2px;
+    }
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%; height: 4px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 4px;
+      outline: none;
+      cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px; height: 20px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.3);
+      transition: transform 0.15s;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.18);
+    }
+
+    /* Action buttons */
+    .action-buttons {
+      display: flex; gap: 8px; margin-top: 2px;
+    }
+    .btn {
+      flex: 1; padding: 11px;
+      border-radius: 12px;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      border: none; outline: none;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn:hover { opacity: 0.88; transform: scale(0.98); }
+    .btn:active { transform: scale(0.94); }
+    .btn-primary {
+      background: rgba(99, 179, 237, 0.75);
+      color: white;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .btn-danger {
+      background: rgba(220, 80, 80, 0.65);
+      color: white;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    /* ─── Footer ──────────────────────────────── */
+    .footer {
+      flex-shrink: 0;
+      padding: 8px 16px 14px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .footer-quit {
+      width: 100%;
+      padding: 9px;
+      border-radius: 10px;
+      border: none; outline: none;
+      font-size: 12px; font-weight: 600;
+      cursor: pointer;
+      background: rgba(220, 60, 60, 0.55);
+      color: rgba(255,255,255,0.9);
+      transition: background 0.2s, transform 0.15s;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .footer-quit:hover { background: rgba(220, 60, 60, 0.8); transform: scale(0.98); }
+    .footer-quit:active { transform: scale(0.94); }
+    .footer-shortcut {
+      font-size: 10px; opacity: 0.5;
+      text-align: center;
+      margin-top: 6px;
+    }
+    kbd {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-family: inherit;
+      font-size: 10px;
+    }
+  </style>
+</head>
+<body>
+  <!-- ── HEADER ─────────────────────────────── -->
+  <div class="header">
+    <div class="back-btn" id="back-btn" style="display:none">‹</div>
+    <div class="header-title" id="header-title">My Pets</div>
+    <div class="header-spacer" id="header-spacer"></div>
+  </div>
+
+  <!-- ── CONTENT AREA ───────────────────────── -->
+  <div class="content">
+    <!-- Grid View -->
+    <div class="grid" id="char-grid"></div>
+
+    <!-- Settings Panel -->
+    <div class="settings-panel" id="settings-panel">
+      <div class="char-preview">
+        <img id="settings-preview-img" src="" alt="">
+        <div class="char-preview-name" id="settings-preview-name"></div>
+      </div>
+
+      <div class="settings-card">
+        <div style="font-weight: 600; font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; padding-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">Appearance & Effects</div>
+        <!-- Size slider -->
+        <div class="slider-row">
+          <div class="slider-header">
+            <div class="setting-icon">🔍</div>
+            <div class="setting-info">
+              <div class="setting-label">Size</div>
+            </div>
+            <div class="slider-value-badge" id="size-badge">100%</div>
+          </div>
+          <input type="range" id="size-slider" min="30" max="250" value="100" step="5">
+          <div class="slider-labels"><span>Tiny</span><span>Normal</span><span>Giant</span></div>
+        </div>
+        <!-- Opacity slider -->
+        <div class="slider-row" style="margin-top: 16px;">
+          <div class="slider-header">
+            <div class="setting-icon">👻</div>
+            <div class="setting-info">
+              <div class="setting-label">Opacity</div>
+              <div class="setting-description">Transparency level</div>
+            </div>
+            <div class="slider-value-badge" id="opacity-badge">100%</div>
+          </div>
+          <input type="range" id="opacity-slider" min="20" max="100" value="100" step="5">
+          <div class="slider-labels"><span>20% (Ghost)</span><span>Half</span><span>100% (Solid)</span></div>
+        </div>
+        <!-- Flip toggle -->
+        <div class="setting-row" style="margin-top: 16px;">
+          <div class="setting-icon">🔄</div>
+          <div class="setting-info">
+            <div class="setting-label">Mirror sprite</div>
+            <div class="setting-description">Flip horizontally to face the other way</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="flip-toggle">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <!-- Shadow dropdown -->
+        <div class="setting-row">
+          <div class="setting-icon">🌑</div>
+          <div class="setting-info">
+            <div class="setting-label">Shadow Effect</div>
+            <div class="setting-description">Shadow under the pet</div>
+          </div>
+          <select id="shadow-select" class="style-select">
+            <option value="none">None (Default)</option>
+            <option value="ground">Ground Oval Shadow</option>
+            <option value="drop">Drop Shadow</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div style="font-weight: 600; font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; padding-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">Movement & Area</div>
+        <!-- Walk toggle -->
+        <div class="setting-row">
+          <div class="setting-icon">🚶</div>
+          <div class="setting-info">
+            <div class="setting-label">Walking</div>
+            <div class="setting-description">Pet walks around the screen</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="walk-toggle" checked>
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <!-- Walk style dropdown -->
+        <div class="setting-row">
+          <div class="setting-icon">🎬</div>
+          <div class="setting-info">
+            <div class="setting-label">Walk Style</div>
+            <div class="setting-description">Animation while moving</div>
+          </div>
+          <select id="walk-style-select" class="style-select">
+            <option value="bounce">Bounce</option>
+            <option value="glide">Glide</option>
+            <option value="hop">Hop</option>
+            <option value="waddle">Waddle</option>
+          </select>
+        </div>
+        <!-- Movement type dropdown -->
+        <div class="setting-row">
+          <div class="setting-icon">🗺️</div>
+          <div class="setting-info">
+            <div class="setting-label">Movement Type</div>
+            <div class="setting-description">How the pet moves around</div>
+          </div>
+          <select id="movement-type-select" class="style-select">
+            <option value="ground">Ground (bottom)</option>
+            <option value="platform">Levels / Platforms</option>
+            <option value="free-roam">Free Roam (flying)</option>
+          </select>
+        </div>
+        <!-- Movement area slider -->
+        <div class="slider-row">
+          <div class="slider-header">
+            <div class="setting-icon">📐</div>
+            <div class="setting-info">
+              <div class="setting-label">Movement Area</div>
+              <div class="setting-description">Vertical screen space used</div>
+            </div>
+            <div class="slider-value-badge" id="area-badge">100%</div>
+          </div>
+          <input type="range" id="area-slider" min="10" max="100" value="100" step="10">
+          <div class="slider-labels"><span>Bottom 10%</span><span>Half</span><span>Full screen</span></div>
+        </div>
+        <!-- Trail dropdown -->
+        <div class="setting-row" style="margin-top: 16px;">
+          <div class="setting-icon">🐾</div>
+          <div class="setting-info">
+            <div class="setting-label">Walking Trail</div>
+            <div class="setting-description">Particles left behind while moving</div>
+          </div>
+          <select id="trail-select" class="style-select">
+            <option value="none">None (Default)</option>
+            <option value="paw">Paw prints 🐾</option>
+            <option value="sparkle">Sparkles ✨</option>
+            <option value="heart">Hearts ❤️</option>
+            <option value="note">Music Notes 🎵</option>
+            <option value="star">Stars ⭐</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div style="font-weight: 600; font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; padding-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">Speed & Activity</div>
+        <!-- Speed slider -->
+        <div class="slider-row">
+          <div class="slider-header">
+            <div class="setting-icon">⚡</div>
+            <div class="setting-info">
+              <div class="setting-label">Movement Speed</div>
+              <div class="setting-description">How fast the pet walks or flies</div>
+            </div>
+            <div class="slider-value-badge" id="speed-badge">1.00x</div>
+          </div>
+          <input type="range" id="speed-slider" min="0.5" max="2.5" value="1.0" step="0.25">
+          <div class="slider-labels"><span>Slow (0.5x)</span><span>Normal</span><span>Fast (2.5x)</span></div>
+        </div>
+        <!-- Pause duration slider -->
+        <div class="slider-row" style="margin-top: 16px;">
+          <div class="slider-header">
+            <div class="setting-icon">⏸️</div>
+            <div class="setting-info">
+              <div class="setting-label">Pause Duration</div>
+              <div class="setting-description">Rest time between movements</div>
+            </div>
+            <div class="slider-value-badge" id="pause-badge">2s</div>
+          </div>
+          <input type="range" id="pause-slider" min="0" max="10" value="2" step="1">
+          <div class="slider-labels"><span>No pause (0s)</span><span>2s</span><span>Long rest (10s)</span></div>
+        </div>
+        <!-- Activity level slider -->
+        <div class="slider-row" style="margin-top: 16px;">
+          <div class="slider-header">
+            <div class="setting-icon">🔥</div>
+            <div class="setting-info">
+              <div class="setting-label">Activity Level</div>
+              <div class="setting-description">How often the pet decides to move</div>
+            </div>
+            <div class="slider-value-badge" id="activity-badge">50%</div>
+          </div>
+          <input type="range" id="activity-slider" min="10" max="100" value="50" step="10">
+          <div class="slider-labels"><span>Sleepy (10%)</span><span>Balanced</span><span>Hyperactive</span></div>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div style="font-weight: 600; font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; padding-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">Behaviors & Reactions</div>
+        <!-- Cursor reaction dropdown -->
+        <div class="setting-row">
+          <div class="setting-icon">🖱️</div>
+          <div class="setting-info">
+            <div class="setting-label">Cursor Reaction</div>
+            <div class="setting-description">How the pet reacts to mouse proximity</div>
+          </div>
+          <select id="cursor-reaction-select" class="style-select">
+            <option value="ignore">Ignore cursor (Default)</option>
+            <option value="curious">Curious (Follow mouse)</option>
+            <option value="avoid">Shy / Avoid (Run away)</option>
+          </select>
+        </div>
+        <!-- Idle behavior dropdown -->
+        <div class="setting-row">
+          <div class="setting-icon">💤</div>
+          <div class="setting-info">
+            <div class="setting-label">Idle Behavior</div>
+            <div class="setting-description">What the pet does while resting</div>
+          </div>
+          <select id="idle-behavior-select" class="style-select">
+            <option value="static">Normal (Static)</option>
+            <option value="lookAtCursor">Look at cursor</option>
+            <option value="fidget">Fidget (Look around)</option>
+            <option value="sleep">Sleep after 8s (Zzz particles)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-primary" id="btn-select">✓ Select this pet</button>
+        <button class="btn btn-danger" id="btn-remove">🗑 Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const fs = require('fs');
+    const path = require('path');
+    const { ipcRenderer } = require('electron');
+
+    const charsDir = path.join(__dirname, 'characters');
+    const settingsPath = path.join(charsDir, 'settings.json');
+    const validExtensions = ['.gif', '.png', '.jpg', '.jpeg', '.webp', '.svg'];
+
+    // ─── Settings storage ─────────────────────────────────────────────────────
+    function loadSettings() {
+      try { return JSON.parse(fs.readFileSync(settingsPath, 'utf8')); }
+      catch { return {}; }
+    }
+
+    function saveSettings(settings) {
+      fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2), 'utf8');
+    }
+
+    function getCharSettings(filename) {
+      const all = loadSettings();
+      return { scale: 1.0, walking: true, flipped: false, walkStyle: 'bounce', movementType: 'ground', movementArea: 100, speedMultiplier: 1.0, pauseDuration: 2, activityLevel: 50, cursorReaction: 'ignore', opacity: 100, shadow: 'none', trail: 'none', idleBehavior: 'static', ...(all[filename] || {}) };
+    }
+
+    function updateCharSettings(filename, changes) {
+      const all = loadSettings();
+      all[filename] = { ...getCharSettings(filename), ...changes };
+      saveSettings(all);
+    }
+
+    // ─── Views ───────────────────────────────────────────────────────────────
+    let currentEditChar = null;
+
+    const grid = document.getElementById('char-grid');
+    const settingsPanel = document.getElementById('settings-panel');
+    const backBtn = document.getElementById('back-btn');
+    const headerTitle = document.getElementById('header-title');
+    const headerSpacer = document.getElementById('header-spacer');
+
+    function showGrid() {
+      grid.style.display = 'grid';
+      settingsPanel.classList.remove('visible');
+      backBtn.style.display = 'none';
+      headerSpacer.style.display = '';
+      headerTitle.textContent = 'My Pets';
+      currentEditChar = null;
+    }
+
+    function showSettingsFor(filename) {
+      currentEditChar = filename;
+      const name = path.parse(filename).name;
+      const cfg = getCharSettings(filename);
+
+      document.getElementById('settings-preview-img').src = `characters/${filename}`;
+      document.getElementById('settings-preview-name').textContent = name;
+
+      const sliderEl = document.getElementById('size-slider');
+      const badgeEl = document.getElementById('size-badge');
+      sliderEl.value = Math.round(cfg.scale * 100);
+      badgeEl.textContent = sliderEl.value + '%';
+
+      document.getElementById('walk-toggle').checked = cfg.walking !== false;
+      document.getElementById('walk-style-select').value = cfg.walkStyle || 'bounce';
+      document.getElementById('movement-type-select').value = cfg.movementType || 'ground';
+      
+      const areaEl = document.getElementById('area-slider');
+      const areaBadgeEl = document.getElementById('area-badge');
+      const areaVal = cfg.movementArea !== undefined ? cfg.movementArea : 100;
+      areaEl.value = areaVal;
+      areaBadgeEl.textContent = areaVal + '%';
+
+      const speedEl = document.getElementById('speed-slider');
+      const speedBadgeEl = document.getElementById('speed-badge');
+      const speedVal = cfg.speedMultiplier !== undefined ? cfg.speedMultiplier : 1.0;
+      speedEl.value = speedVal;
+      speedBadgeEl.textContent = Number(speedVal).toFixed(2) + 'x';
+
+      const pauseEl = document.getElementById('pause-slider');
+      const pauseBadgeEl = document.getElementById('pause-badge');
+      const pauseVal = cfg.pauseDuration !== undefined ? cfg.pauseDuration : 2;
+      pauseEl.value = pauseVal;
+      pauseBadgeEl.textContent = pauseVal + 's';
+
+      const activityEl = document.getElementById('activity-slider');
+      const activityBadgeEl = document.getElementById('activity-badge');
+      const activityVal = cfg.activityLevel !== undefined ? cfg.activityLevel : 50;
+      activityEl.value = activityVal;
+      activityBadgeEl.textContent = activityVal + '%';
+
+      document.getElementById('cursor-reaction-select').value = cfg.cursorReaction || 'ignore';
+      document.getElementById('idle-behavior-select').value = cfg.idleBehavior || 'static';
+      document.getElementById('shadow-select').value = cfg.shadow || 'none';
+      document.getElementById('trail-select').value = cfg.trail || 'none';
+      
+      const opacityEl = document.getElementById('opacity-slider');
+      const opacityBadgeEl = document.getElementById('opacity-badge');
+      const opacityVal = cfg.opacity !== undefined ? cfg.opacity : 100;
+      opacityEl.value = opacityVal;
+      opacityBadgeEl.textContent = opacityVal + '%';
+
+      document.getElementById('flip-toggle').checked = cfg.flipped === true;
+
+      grid.style.display = 'none';
+      settingsPanel.classList.add('visible');
+      backBtn.style.display = 'flex';
+      headerSpacer.style.display = 'none';
+      headerTitle.textContent = name;
+    }
+
+    backBtn.addEventListener('click', showGrid);
+
+    // ─── Size slider ─────────────────────────────────────────────────────────
+    const sliderEl = document.getElementById('size-slider');
+    const badgeEl = document.getElementById('size-badge');
+    sliderEl.addEventListener('input', () => {
+      const pct = sliderEl.value;
+      badgeEl.textContent = pct + '%';
+      if (currentEditChar) {
+        const scale = pct / 100;
+        updateCharSettings(currentEditChar, { scale });
+        ipcRenderer.send('update-char-settings', { filename: currentEditChar, scale });
+      }
+    });
+
+    // ─── Walk toggle ─────────────────────────────────────────────────────────
+    document.getElementById('walk-toggle').addEventListener('change', (e) => {
+      if (currentEditChar) {
+        const walking = e.target.checked;
+        updateCharSettings(currentEditChar, { walking });
+        ipcRenderer.send('update-char-settings', { filename: currentEditChar, walking });
+      }
+    });
+
+    // ─── Walk style select ───────────────────────────────────────────────────
+    document.getElementById('walk-style-select').addEventListener('change', (e) => {
+      if (currentEditChar) {
+        const walkStyle = e.target.value;
+        updateCharSettings(currentEditChar, { walkStyle });
+        ipcRenderer.send('update-char-settings', { filename: currentEditChar, walkStyle });
+      }
+    });
+
+    // ─── Movement type select ────────────────────────────────────────────────
+    document.getElementById('movement-type-select').addEventListener('change', (e) => {
+      if (currentEditChar) {
+        const movementType = e.target.value;
+        updateCharSettings(currentEditChar, { movementType });
+        ipcRenderer.send('update-char-settings', { filename: currentEditChar, movementType });
+      }
+    });
+
+    // ─── Movement area slider ────────────────────────────────────────────────
+    const areaEl = document.getElementById('area-slider');
+    const areaBadgeEl = document.getElementById('area-badge');
+    areaEl.addEventListener('input', () => {
+      const movementArea = Number(areaEl.value);
+      areaBadgeEl.textContent = movementArea + '%';
+      if (currentEditChar) {
+        updateCharSettings(currentEditChar, { movementArea });
+        ipcRenderer.send('update-char-settings', { filename: currentEditChar, movementArea });
+      }
+    });
+
+    // ─── Speed slider ────────────────────────────────────────────────────────
+    const speedEl = document.getElementById('speed-slider');
+    const speedBadgeEl = document.getElementById('speed-badge');
+    speedEl.addEventListener('input', () => {
+      const speedMultiplier = Number(speedEl.value);
+      speedBadgeEl.textContent = speedMultiplier.toFixed(2) + 'x';
+      if (currentEditChar) {
+        updateCharSettings(currentEditChar, { speedMultiplier });
+        ipcRenderer.send('update-char-settings', { filename: currentEditChar, speedMultiplier });
+      }
+    });
+
+    // ─── Pause duration slider ───────────────────────────────────────────────
+    const pauseEl = document.getElementById('pause-slider');
+    const pauseBadgeEl = document.getElementById('pause-badge');
+    pauseEl.addEventListener('input', () => {
+      const pauseDuration = Number(pauseEl.value);
+      pauseBadgeEl.textContent = pauseDuration + 's';
+      if (currentEditChar) {
+        updateCharSettings(currentEditChar, { pauseDuration });
+        ipcRenderer.send('update-char-settings', { filename: currentEditChar, pauseDuration });
+      }
+    });
+
+    // ─── Activity level slider ───────────────────────────────────────────────
+    const activityEl = document.getElementById('activity-slider');
+    const activityBadgeEl = document.getElementById('activity-badge');
+    activityEl.addEventListener('input', () => {
+      const activityLevel = Number(activityEl.value);
+      activityBadgeEl.textContent = activityLevel + '%';
+      if (currentEditChar) {
+        updateCharSettings(currentEditChar, { activityLevel });
+        ipcRenderer.send('update-char-settings', { filename: currentEditChar, activityLevel });
+      }
+    });
+
+    // ─── Flip toggle ─────────────────────────────────────────────────────────
+    document.getElementById('flip-toggle').addEventListener('change', (e) => {
+      if (currentEditChar) {
+        const flipped = e.target.checked;
+        updateCharSettings(currentEditChar, { flipped });
+        ipcRenderer.send('update-char-settings', { filename: currentEditChar, flipped });
+      }
+    });
+
+    // ─── Cursor reaction select ──────────────────────────────────────────────
+    document.getElementById('cursor-reaction-select').addEventListener('change', (e) => {
+      if (currentEditChar) {
+        const cursorReaction = e.target.value;
+        updateCharSettings(currentEditChar, { cursorReaction });
+        ipcRenderer.send('update-char-settings', { filename: currentEditChar, cursorReaction });
+      }
+    });
+
+    // ─── Idle behavior select ────────────────────────────────────────────────
+    document.getElementById('idle-behavior-select').addEventListener('change', (e) => {
+      if (currentEditChar) {
+        const idleBehavior = e.target.value;
+        updateCharSettings(currentEditChar, { idleBehavior });
+        ipcRenderer.send('update-char-settings', { filename: currentEditChar, idleBehavior });
+      }
+    });
+
+    // ─── Shadow select ───────────────────────────────────────────────────────
+    document.getElementById('shadow-select').addEventListener('change', (e) => {
+      if (currentEditChar) {
+        const shadow = e.target.value;
+        updateCharSettings(currentEditChar, { shadow });
+        ipcRenderer.send('update-char-settings', { filename: currentEditChar, shadow });
+      }
+    });
+
+    // ─── Trail select ────────────────────────────────────────────────────────
+    document.getElementById('trail-select').addEventListener('change', (e) => {
+      if (currentEditChar) {
+        const trail = e.target.value;
+        updateCharSettings(currentEditChar, { trail });
+        ipcRenderer.send('update-char-settings', { filename: currentEditChar, trail });
+      }
+    });
+
+    // ─── Opacity slider ──────────────────────────────────────────────────────
+    const opacityEl = document.getElementById('opacity-slider');
+    const opacityBadgeEl = document.getElementById('opacity-badge');
+    opacityEl.addEventListener('input', () => {
+      const opacity = Number(opacityEl.value);
+      opacityBadgeEl.textContent = opacity + '%';
+      if (currentEditChar) {
+        updateCharSettings(currentEditChar, { opacity });
+        ipcRenderer.send('update-char-settings', { filename: currentEditChar, opacity });
+      }
+    });
+
+    // ─── Action buttons ───────────────────────────────────────────────────────
+    document.getElementById('btn-select').addEventListener('click', () => {
+      if (currentEditChar) {
+        const cfg = getCharSettings(currentEditChar);
+        ipcRenderer.send('select-character', currentEditChar);
+        showGrid();
+      }
+    });
+
+    document.getElementById('btn-remove').addEventListener('click', () => {
+      if (!currentEditChar) return;
+      const targetPath = path.join(charsDir, currentEditChar);
+      try { fs.unlinkSync(targetPath); } catch {}
+      // Also remove settings entry
+      const all = loadSettings();
+      delete all[currentEditChar];
+      saveSettings(all);
+      showGrid();
+      loadGrid();
+    });
+
+    // ─── Grid rendering ──────────────────────────────────────────────────────
+    function loadGrid() {
+      grid.innerHTML = '';
+
+      // "Add New" Card
+      const addCard = document.createElement('div');
+      addCard.className = 'char-card add-card';
+      addCard.innerHTML = `<div class="add-icon">+</div><div class="char-name">Add Character</div>`;
+      addCard.onclick = () => ipcRenderer.send('add-character');
+      grid.appendChild(addCard);
+
+      // Character cards
+      try {
+        const files = fs.readdirSync(charsDir);
+        const images = files.filter(f => validExtensions.includes(path.extname(f).toLowerCase()));
+        images.forEach(img => {
+          const card = document.createElement('div');
+          card.className = 'char-card';
+          card.dataset.filename = img;
+          card.innerHTML = `
+            <div class="char-settings-btn" title="Settings">⚙</div>
+            <img src="characters/${img}" loading="lazy">
+            <div class="char-name">${path.parse(img).name}</div>
+          `;
+          // Click on card body → select character
+          card.addEventListener('click', (e) => {
+            if (e.target.classList.contains('char-settings-btn')) return;
+            ipcRenderer.send('select-character', img);
+          });
+          // Click on ⚙ → open settings
+          card.querySelector('.char-settings-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            showSettingsFor(img);
+          });
+          grid.appendChild(card);
+        });
+      } catch {}
+    }
+
+    loadGrid();
+
+    ipcRenderer.on('refresh-menu', () => loadGrid());
+  </script>
+</body>
+</html>

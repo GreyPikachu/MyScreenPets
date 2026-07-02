@@ -1,0 +1,83 @@
+{
+  "Pikachu.gif": {
+    "scale": 1.1,
+    "walking": true,
+    "flipped": false,
+    "walkStyle": "glide",
+    "movementType": "ground",
+    "movementArea": 100,
+    "speedMultiplier": 1,
+    "pauseDuration": 2,
+    "activityLevel": 50,
+    "cursorReaction": "ignore",
+    "opacity": 100,
+    "shadow": "none",
+    "trail": "none",
+    "idleBehavior": "sleep"
+  },
+  "flygon.gif": {
+    "scale": 1.75,
+    "walking": true,
+    "flipped": false,
+    "walkStyle": "bounce",
+    "movementType": "free-roam",
+    "movementArea": 100,
+    "speedMultiplier": 1.25,
+    "pauseDuration": 2,
+    "activityLevel": 30,
+    "cursorReaction": "avoid",
+    "opacity": 100,
+    "shadow": "none",
+    "trail": "none",
+    "idleBehavior": "static"
+  },
+  "gengar.gif": {
+    "scale": 1.4,
+    "walking": true,
+    "flipped": false
+  },
+  "gengar-mega.gif": {
+    "scale": 1.6,
+    "walking": true,
+    "flipped": false,
+    "walkStyle": "bounce",
+    "movementType": "ground",
+    "movementArea": 90,
+    "speedMultiplier": 1,
+    "pauseDuration": 2,
+    "activityLevel": 40
+  },
+  "gengar-gmax.gif": {
+    "scale": 2.5,
+    "walking": false,
+    "flipped": false
+  },
+  "pikachu-cosplay.gif": {
+    "scale": 1,
+    "walking": true
+  },
+  "pikachu-kalos.gif": {
+    "scale": 1,
+    "walking": true
+  },
+  "rayquaza.gif": {
+    "scale": 2.5,
+    "walking": true,
+    "flipped": false,
+    "walkStyle": "bounce",
+    "movementType": "free-roam",
+    "movementArea": 100,
+    "speedMultiplier": 2.5,
+    "pauseDuration": 2,
+    "activityLevel": 50,
+    "cursorReaction": "ignore"
+  },
+  "rayquaza-mega.gif": {
+    "scale": 2.5,
+    "walking": true,
+    "flipped": false,
+    "walkStyle": "bounce",
+    "movementType": "ground",
+    "movementArea": 100
+  }
+}
