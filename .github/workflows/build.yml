@@ -1,0 +1,39 @@
+name: Build macOS App
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build macOS App
+      run: npm run build:mac
+
+    - name: Zip the application
+      run: |
+        cd dist
+        # Zip the .app bundle to preserve file permissions
+        zip -q -r MyScreenPets-macOS.zip MyScreenPets-darwin-*/MyScreenPets.app
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: MyScreenPets-macOS
+        path: dist/MyScreenPets-macOS.zip
+        retention-days: 30
