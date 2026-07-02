@@ -938,17 +938,23 @@
       if (files && files.length > 0) {
         for (let i = 0; i < files.length; i++) {
           const file = files[i];
-          const ext = path.extname(file.path).toLowerCase();
+          const ext = path.extname(file.path || '').toLowerCase();
           if (ext === '.gif' || ext === '.png') {
             const dest = path.join(charsDir, path.basename(file.path));
             try {
               fs.copyFileSync(file.path, dest);
+              // Tell main process to also reload characters if needed, or just refresh menu
+              ipcRenderer.send('add-character-success'); // optional
             } catch (err) {
-              console.error("Error copying dropped file:", err);
+              alert("Error copying dropped file: " + err.message + "\\nPath: " + file.path);
             }
+          } else {
+            alert("File is not a gif or png: " + (file.path || file.name));
           }
         }
         loadGrid();
+      } else {
+        alert("No files found in drop event.");
       }
     });
   </script>
