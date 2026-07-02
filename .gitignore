@@ -5,3 +5,4 @@ logs/
 .gemini/
 .agents/
 .antigravity/
+dist/
