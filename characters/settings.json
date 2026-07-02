@@ -83,5 +83,21 @@
     "walkStyle": "bounce",
     "movementType": "ground",
     "movementArea": 100
+  },
+  "poochyena.gif": {
+    "scale": 1,
+    "walking": true,
+    "flipped": false,
+    "walkStyle": "bounce",
+    "movementType": "platform",
+    "movementArea": 100,
+    "speedMultiplier": 1,
+    "pauseDuration": 1,
+    "activityLevel": 80,
+    "cursorReaction": "ignore",
+    "opacity": 100,
+    "shadow": "none",
+    "trail": "none",
+    "idleBehavior": "static"
   }
 }
