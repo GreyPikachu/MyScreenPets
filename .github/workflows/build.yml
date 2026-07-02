@@ -27,18 +27,12 @@ jobs:
     - name: Build macOS App
       run: npm run build:mac
 
-    - name: Zip the application
-      run: |
-        cd dist
-        # Zip the .app bundle to preserve file permissions
-        zip -q -r MyScreenPets-macOS.zip MyScreenPets-darwin-*/MyScreenPets.app
-
     - name: Create or Update Release
       uses: softprops/action-gh-release@v2
       with:
         tag_name: nightly
         name: "Latest Build"
         prerelease: true
-        files: dist/MyScreenPets-macOS.zip
+        files: dist/*.dmg
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

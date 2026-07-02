@@ -5,7 +5,21 @@
   "main": "index.js",
   "scripts": {
     "start": "electron .",
-    "build:mac": "electron-packager . MyScreenPets --platform=darwin --out=dist --overwrite"
+    "build:mac": "electron-builder --mac"
+  },
+  "build": {
+    "appId": "com.greypikachu.myscreenpets",
+    "productName": "MyScreenPets",
+    "mac": {
+      "target": "dmg"
+    },
+    "dmg": {
+      "title": "Install MyScreenPets",
+      "contents": [
+        { "x": 130, "y": 220 },
+        { "x": 410, "y": 220, "type": "link", "path": "/Applications" }
+      ]
+    }
   },
   "keywords": [],
   "author": "",
@@ -13,6 +27,7 @@
   "type": "commonjs",
   "devDependencies": {
     "electron": "^42.5.0",
+    "electron-builder": "^25.1.8",
     "electron-packager": "^17.1.2"
   }
 }
