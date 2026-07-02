@@ -187,7 +187,7 @@ function openMenuWindow() {
     minWidth: 340,
     minHeight: 450,
     transparent: true,
-    vibrancy: 'popover', // Apple's Liquid Glass effect
+    vibrancy: 'hud', // Forces a dark translucent appearance on macOS
     visualEffectState: 'active',
     frame: false,
     titleBarStyle: 'hiddenInset',

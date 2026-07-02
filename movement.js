@@ -60,9 +60,9 @@ class MovementEngine {
     const maxY = Math.max(0, screenHeight - winHeight);
     const minY = Math.max(0, Math.round(maxY - maxY * areaPct));
 
-    // Check food priority across states
+    // Check food priority across states (only if walking is enabled)
     const food = this.ctrl.getFood();
-    if (food && food.active) {
+    if (settings.walking && food && food.active) {
       this.wasIdle = false;
       this.idleStartTimestamp = undefined;
       if (state === 'idle') {
@@ -71,10 +71,10 @@ class MovementEngine {
       }
     }
 
-    // Check cursor reaction
+    // Check cursor reaction (only if walking is enabled)
     const cursor = this.ctrl.getCursor ? this.ctrl.getCursor() : null;
     let isReactingToCursor = false;
-    if (cursor && Number.isFinite(cursor.x) && Number.isFinite(cursor.y) && this.config.cursorReaction !== 'ignore' && (!food || !food.active)) {
+    if (settings.walking && cursor && Number.isFinite(cursor.x) && Number.isFinite(cursor.y) && this.config.cursorReaction !== 'ignore' && (!food || !food.active)) {
       const centerX = currentX + winWidth / 2;
       const centerY = currentY + winHeight / 2;
       const dxToCursor = cursor.x - centerX;

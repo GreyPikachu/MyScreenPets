@@ -3,7 +3,7 @@
     "scale": 1.1,
     "walking": true,
     "flipped": false,
-    "walkStyle": "glide",
+    "walkStyle": "bounce",
     "movementType": "ground",
     "movementArea": 100,
     "speedMultiplier": 1,
@@ -62,7 +62,7 @@
   },
   "rayquaza.gif": {
     "scale": 2.5,
-    "walking": true,
+    "walking": false,
     "flipped": false,
     "walkStyle": "bounce",
     "movementType": "free-roam",
@@ -70,7 +70,11 @@
     "speedMultiplier": 2.5,
     "pauseDuration": 2,
     "activityLevel": 50,
-    "cursorReaction": "ignore"
+    "cursorReaction": "ignore",
+    "opacity": 100,
+    "shadow": "none",
+    "trail": "none",
+    "idleBehavior": "lookAtCursor"
   },
   "rayquaza-mega.gif": {
     "scale": 2.5,

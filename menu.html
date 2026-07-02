@@ -7,7 +7,8 @@
     body {
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
       color: rgba(255, 255, 255, 0.92);
-      background: transparent;
+      /* Dark tint over the vibrancy to ensure white text is always readable */
+      background: rgba(0, 0, 0, 0.4);
       overflow: hidden;
       height: 100vh;
       display: flex;
@@ -131,6 +132,7 @@
       border-color: rgba(255,255,255,0.5);
     }
     .add-icon { font-size: 28px; font-weight: 300; line-height: 1; }
+
 
     /* ─── Settings Panel ─────────────────────── */
     .settings-panel {
@@ -337,9 +339,23 @@
       font-family: inherit;
       font-size: 10px;
     }
+    .drag-overlay {
+      display: none;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 1000;
+      flex-direction: column; align-items: center; justify-content: center;
+      color: white; pointer-events: none;
+    }
+    .drag-overlay.active { display: flex; }
   </style>
 </head>
 <body>
+  <div class="drag-overlay" id="drag-overlay">
+    <div style="font-size: 32px; margin-bottom: 8px;">📂</div>
+    <div>Drop GIF here</div>
+  </div>
+
   <!-- ── HEADER ─────────────────────────────── -->
   <div class="header">
     <div class="back-btn" id="back-btn" style="display:none">‹</div>
@@ -348,7 +364,7 @@
   </div>
 
   <!-- ── CONTENT AREA ───────────────────────── -->
-  <div class="content">
+  <div class="content" id="drop-zone">
     <!-- Grid View -->
     <div class="grid" id="char-grid"></div>
 
@@ -853,7 +869,10 @@
       const addCard = document.createElement('div');
       addCard.className = 'char-card add-card';
       addCard.innerHTML = `<div class="add-icon">+</div><div class="char-name">Add Character</div>`;
-      addCard.onclick = () => ipcRenderer.send('add-character');
+      addCard.onclick = () => {
+        // Send add-character signal to main to open file dialog, or handle via IPC
+        ipcRenderer.send('add-character');
+      };
       grid.appendChild(addCard);
 
       // Character cards
@@ -887,6 +906,51 @@
     loadGrid();
 
     ipcRenderer.on('refresh-menu', () => loadGrid());
+    
+    // ─── Drag and Drop Logic ───────────────────────────────────────────────────
+    const dragOverlay = document.getElementById('drag-overlay');
+    let dragCounter = 0;
+
+    document.addEventListener('dragenter', (e) => {
+      e.preventDefault();
+      dragCounter++;
+      dragOverlay.classList.add('active');
+    });
+
+    document.addEventListener('dragover', (e) => {
+      e.preventDefault();
+    });
+
+    document.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      dragCounter--;
+      if (dragCounter === 0) {
+        dragOverlay.classList.remove('active');
+      }
+    });
+
+    document.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dragCounter = 0;
+      dragOverlay.classList.remove('active');
+      
+      const files = e.dataTransfer.files;
+      if (files && files.length > 0) {
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const ext = path.extname(file.path).toLowerCase();
+          if (ext === '.gif' || ext === '.png') {
+            const dest = path.join(charsDir, path.basename(file.path));
+            try {
+              fs.copyFileSync(file.path, dest);
+            } catch (err) {
+              console.error("Error copying dropped file:", err);
+            }
+          }
+        }
+        loadGrid();
+      }
+    });
   </script>
 </body>
 </html>
