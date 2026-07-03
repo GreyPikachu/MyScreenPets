@@ -188,7 +188,7 @@ class MovementEngine {
           this.targetLevelY = maxY;
         } else if (this.config.movementType === 'free-roam') {
           this.targetRoamX = food.targetX;
-          this.targetRoamY = maxY;
+          this.targetRoamY = Math.max(minY, Math.min(maxY, food.targetY - winHeight + 50));
         }
       }
 
@@ -302,7 +302,8 @@ class MovementEngine {
 
       if (food && food.active) {
         const isXAligned = food.targetX >= currentX - 10 && food.targetX <= currentX + winWidth + 10;
-        if (isXAligned && Math.abs(currentY - maxY) < 15) {
+        const isYAligned = this.config.movementType === 'free-roam' ? Math.abs(currentY - (food.targetY - winHeight + 50)) < 15 : Math.abs(currentY - maxY) < 15;
+        if (isXAligned && isYAligned) {
           this.ctrl.onEatFood();
         }
       } else if (!isReactingToCursor) {

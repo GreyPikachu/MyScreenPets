@@ -243,7 +243,7 @@ ipcMain.on('spawn-food', (event, { x, y }) => {
   foodWindow.setAlwaysOnTop(true, 'screen-saver');
   foodWindow.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent('<html style="margin:0;overflow:hidden;background:transparent;display:flex;justify-content:center;align-items:center;height:100%;font-size:30px;user-select:none;">🍟</html>'));
   
-  event.reply('food-spawned', { x });
+  event.reply('food-spawned', { x, y });
 });
 
 ipcMain.on('eat-food', () => {

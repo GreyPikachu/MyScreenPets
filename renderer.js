@@ -22,6 +22,7 @@ let currentX = screenWidth / 2 - 75;
 let currentY = screenHeight - 150;
 let foodActive = false;
 let foodTargetX = 0;
+let foodTargetY = 0;
 let cursorScreenX = null;
 let cursorScreenY = null;
 
@@ -234,7 +235,7 @@ movementEngine = new MovementEngine({
   moveWindow: (dx, dy) => ipcRenderer.send('move-window', { x: dx, y: dy }),
   getBounds: () => ({ screenWidth, screenHeight, winWidth, winHeight }),
   getCharSettings: () => charSettings,
-  getFood: () => ({ active: foodActive, targetX: foodTargetX }),
+  getFood: () => ({ active: foodActive, targetX: foodTargetX, targetY: foodTargetY }),
   getCursor: () => ({ x: cursorScreenX, y: cursorScreenY }),
   spawnTrail: (emoji) => spawnTrailParticle(emoji),
   spawnSleepZzz: () => spawnSleepParticle(),
@@ -252,9 +253,10 @@ movementEngine = new MovementEngine({
 movementEngine.start();
 
 // IPC Listener for food
-ipcRenderer.on('food-spawned', (event, { x }) => {
+ipcRenderer.on('food-spawned', (event, { x, y }) => {
   foodActive = true;
   foodTargetX = x;
+  foodTargetY = y;
   if (foodTargetX > currentX) {
     direction = 1;
   } else {
