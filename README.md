@@ -16,6 +16,14 @@ You can easily manage your companions using the built-in Settings Menu. To open 
 ### Choosing Your Pet
 In the menu, you can select which pet you want to display on your screen. You can add new characters by clicking the "Add character" button and selecting any `.gif` file, or by dropping GIFs directly into the `characters` folder of the application.
 
+#### Downloading Bonus Pokémon Sprites
+If you want to access a massive library of Pokémon sprites (over 1600+ animated GIFs), you can use the included downloader script! 
+Simply open your terminal, navigate to the project directory, and run:
+```bash
+node scripts/download-gifs.js
+```
+This will create a `pokemon-gifs` folder and download the sprites. You can then copy any GIFs you like from that folder into the `characters` folder to use them in the app!
+
 ![Selecting a Pet](assets/videos/selection.gif)
 
 ### Customizing Appearance and Behavior
