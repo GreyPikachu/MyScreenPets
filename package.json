@@ -11,9 +11,11 @@
     "appId": "com.greypikachu.myscreenpets",
     "productName": "MyScreenPets",
     "mac": {
-      "target": "dmg"
+      "target": "dmg",
+      "icon": "assets/icon.icns"
     },
     "dmg": {
+      "icon": "assets/icon.icns",
       "title": "Install MyScreenPets",
       "contents": [
         { "x": 130, "y": 220 },
