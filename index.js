@@ -20,6 +20,8 @@ function createPetWindow() {
     height: 150,
     x: width / 2 - 75,
     y: height - 150, // Start at the bottom
+    type: 'panel',
+    enableLargerThanScreen: true,
     transparent: true,
     frame: false,
     hasShadow: false,
@@ -86,14 +88,67 @@ app.whenReady().then(() => {
     }
   });
 
+  let dragOffset = null;
+  ipcMain.on('start-drag', (e, offset) => { 
+    dragOffset = offset; 
+    if (petWindow) {
+      petWindow._wallRight = undefined;
+      petWindow._wallLeft = undefined;
+      petWindow._wallTop = undefined;
+      petWindow._wallBottom = undefined;
+      petWindow._lastNx = undefined;
+      petWindow._lastNy = undefined;
+    }
+  });
+  ipcMain.on('stop-drag', () => { 
+    dragOffset = null; 
+    if (petWindow) petWindow.webContents.send('sync-position', petWindow.getPosition()); 
+  });
+
   setInterval(() => {
     if (petWindow && !petWindow.isDestroyed()) {
       try {
         const point = screen.getCursorScreenPoint();
-        petWindow.webContents.send('cursor-update', point);
-      } catch {}
+        if (dragOffset) {
+          const display = screen.getDisplayMatching(petWindow.getBounds());
+          const bounds = petWindow.getBounds();
+          let nx = Math.round(point.x - dragOffset.x);
+          let ny = Math.round(point.y - dragOffset.y);
+
+          // Get actual OS position to detect snapping
+          const [currentX, currentY] = petWindow.getPosition();
+
+          if (petWindow._lastNx !== undefined && currentX !== petWindow._lastNx) {
+            // OS snapped the window!
+            if (petWindow._lastNx > currentX) petWindow._wallRight = currentX;
+            if (petWindow._lastNx < currentX) petWindow._wallLeft = currentX;
+            if (petWindow._lastNy > currentY) petWindow._wallBottom = currentY;
+            if (petWindow._lastNy < currentY) petWindow._wallTop = currentY;
+          }
+
+          // Apply discovered walls
+          if (petWindow._wallRight !== undefined) nx = Math.min(nx, petWindow._wallRight);
+          if (petWindow._wallLeft !== undefined) nx = Math.max(nx, petWindow._wallLeft);
+          if (petWindow._wallBottom !== undefined) ny = Math.min(ny, petWindow._wallBottom);
+          if (petWindow._wallTop !== undefined) ny = Math.max(ny, petWindow._wallTop);
+
+          // Also clamp to display bounds to prevent macOS WindowServer snapping feedback loop (jitter)
+          nx = Math.max(display.bounds.x, Math.min(nx, display.bounds.x + display.bounds.width - bounds.width));
+          ny = Math.max(display.bounds.y, Math.min(ny, display.bounds.y + display.bounds.height - bounds.height));
+          
+          if (nx !== currentX || ny !== currentY) {
+            petWindow.setPosition(nx, ny);
+          }
+          petWindow._lastNx = nx;
+          petWindow._lastNy = ny;
+        } else {
+          petWindow.webContents.send('cursor-update', point);
+        }
+      } catch (err) {
+        logger.error('main', 'Drag loop error', { error: err.message });
+      }
     }
-  }, 150);
+  }, 16);
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

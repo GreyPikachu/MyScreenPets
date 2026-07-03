@@ -1,7 +1,7 @@
 {
   "Pikachu.gif": {
-    "scale": 1.1,
-    "walking": true,
+    "scale": 2.4,
+    "walking": false,
     "flipped": false,
     "walkStyle": "bounce",
     "movementType": "ground",

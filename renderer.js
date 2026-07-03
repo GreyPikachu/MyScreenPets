@@ -71,8 +71,8 @@ function applyCharSettings(cfg) {
   rlog('INFO', 'applyCharSettings', { scale, px, walking: charSettings.walking, flipped: charSettings.flipped });
   
   // Calculate required window size
-  // Horizontal padding reverted to give enough room for wide effects/tails
-  const padH = Math.max(50, Math.round(px * 0.4));
+  // Remove horizontal padding so the character can touch the screen edges without being blocked by invisible window borders
+  const padH = 4;
   // Vertical padding tightened to ~15-20% (20px top for bounce, 10px bottom for shadow)
   const padTop = 20; 
   const padBot = 10; 
@@ -196,33 +196,29 @@ let startWindowY = 0;
 sprite.addEventListener('pointerdown', (e) => {
   isDragging = true;
   hasDragged = false;
-  startMouseScreenX = e.screenX;
-  startMouseScreenY = e.screenY;
-  startWindowX = currentX;
-  startWindowY = currentY;
   sprite.setPointerCapture(e.pointerId);
   if (state === 'walk') setState('idle');
+  ipcRenderer.send('start-drag', { x: e.clientX, y: e.clientY });
 });
 
 sprite.addEventListener('pointermove', (e) => {
   if (isDragging) {
-    const deltaX = e.screenX - startMouseScreenX;
-    const deltaY = e.screenY - startMouseScreenY;
-    if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
-      hasDragged = true;
-    }
-    currentX = startWindowX + deltaX;
-    currentY = startWindowY + deltaY;
-    ipcRenderer.send('set-position', { x: currentX, y: currentY });
+    hasDragged = true;
   }
 });
 
 sprite.addEventListener('pointerup', (e) => {
   isDragging = false;
   sprite.releasePointerCapture(e.pointerId);
+  ipcRenderer.send('stop-drag');
   if (movementEngine && movementEngine.onDragEnd) {
     movementEngine.onDragEnd();
   }
+});
+
+ipcRenderer.on('sync-position', (event, [x, y]) => {
+  currentX = x;
+  currentY = y;
 });
 
 // Logic Loop handled by MovementEngine

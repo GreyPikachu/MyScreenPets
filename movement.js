@@ -156,7 +156,7 @@ class MovementEngine {
             this.targetLevelY = Math.round(minY + Math.random() * (maxY - minY));
           }
         } else if (this.config.movementType === 'free-roam') {
-          this.targetRoamX = Math.round(Math.random() * Math.max(0, screenWidth - winWidth));
+          this.targetRoamX = Math.round(Math.random() * screenWidth);
           this.targetRoamY = Math.round(minY + Math.random() * (maxY - minY));
         }
       }
@@ -211,7 +211,7 @@ class MovementEngine {
           }
         } else if (this.config.movementType === 'free-roam') {
           if (!Number.isFinite(this.targetRoamX) || !Number.isFinite(this.targetRoamY)) {
-            this.targetRoamX = Math.round(Math.random() * Math.max(0, screenWidth - winWidth));
+            this.targetRoamX = Math.round(Math.random() * screenWidth);
             this.targetRoamY = Math.round(minY + Math.random() * (maxY - minY));
           }
           const dxToTarget = this.targetRoamX - currentX;
