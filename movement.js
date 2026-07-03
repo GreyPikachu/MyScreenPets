@@ -301,7 +301,8 @@ class MovementEngine {
       }
 
       if (food && food.active) {
-        if (Math.abs(currentX - food.targetX) < 10 && Math.abs(currentY - maxY) < 15) {
+        const isXAligned = food.targetX >= currentX - 10 && food.targetX <= currentX + winWidth + 10;
+        if (isXAligned && Math.abs(currentY - maxY) < 15) {
           this.ctrl.onEatFood();
         }
       } else if (!isReactingToCursor) {

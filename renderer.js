@@ -276,7 +276,7 @@ sprite.addEventListener('contextmenu', (e) => {
   if (!foodActive) {
     // Determine random food position
     const minX = 0;
-    const maxX = screenWidth - 50; // food is 50px wide
+    const maxX = Math.max(0, screenWidth - winWidth); 
     const x = Math.floor(Math.random() * (maxX - minX + 1)) + minX;
     // They both sit on the ground, so food Y is currentY + winHeight - 50
     ipcRenderer.send('spawn-food', { x, y: currentY + winHeight - 50 });

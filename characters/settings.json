@@ -1,19 +1,19 @@
 {
   "Pikachu.gif": {
-    "scale": 2.4,
-    "walking": false,
+    "scale": 1,
+    "walking": true,
     "flipped": false,
     "walkStyle": "bounce",
-    "movementType": "ground",
+    "movementType": "free-roam",
     "movementArea": 100,
     "speedMultiplier": 1,
     "pauseDuration": 2,
     "activityLevel": 50,
-    "cursorReaction": "ignore",
+    "cursorReaction": "avoid",
     "opacity": 100,
-    "shadow": "none",
+    "shadow": "drop",
     "trail": "none",
-    "idleBehavior": "sleep"
+    "idleBehavior": "lookAtCursor"
   },
   "flygon.gif": {
     "scale": 1.75,
