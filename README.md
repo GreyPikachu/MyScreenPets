@@ -16,7 +16,7 @@ You can easily manage your companions using the built-in Settings Menu. To open 
 ### Choosing Your Pet
 In the menu, you can select which pet you want to display on your screen. You can add new characters by clicking the "Add character" button and selecting any `.gif` file, or by dropping GIFs directly into the `characters` folder of the application.
 
-<video src="assets/videos/selection.mov" width="600" autoplay loop muted controls></video>
+https://github.com/GreyPikachu/MyScreenPets/raw/main/assets/videos/selection.mp4
 
 ### Customizing Appearance and Behavior
 Clicking on an active character allows you to fine-tune how they look and act:
@@ -24,12 +24,12 @@ Clicking on an active character allows you to fine-tune how they look and act:
 - **Opacity**: Make your pet a solid figure or a subtle "ghost" outline.
 - **Walking Style**: Choose how they move across your screen (e.g., bouncing, sliding).
 
-<video src="assets/videos/editing.mov" width="600" autoplay loop muted controls></video>
+https://github.com/GreyPikachu/MyScreenPets/raw/main/assets/videos/editing.mp4
 
 ### Interacting with Your Pet
 Your screen pets are not just static animations! They can react to your cursor dynamically. Try moving your mouse around them and see how they respond.
 
-<video src="assets/videos/interaction.mov" width="600" autoplay loop muted controls></video>
+https://github.com/GreyPikachu/MyScreenPets/raw/main/assets/videos/interaction.mp4
 
 ## Getting Started
 
