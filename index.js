@@ -20,7 +20,6 @@ function createPetWindow() {
     height: 150,
     x: width / 2 - 75,
     y: height - 150, // Start at the bottom
-    type: 'panel',
     enableLargerThanScreen: true,
     transparent: true,
     frame: false,
