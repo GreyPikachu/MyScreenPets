@@ -13,6 +13,78 @@
       height: 100vh;
       display: flex;
       flex-direction: column;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* ─── Light Theme Overrides ──────────────── */
+    body.light-theme {
+      color: rgba(0, 0, 0, 0.85);
+      background: rgba(255, 255, 255, 0.3);
+    }
+    body.light-theme .char-card, body.light-theme .settings-card, body.light-theme .add-card {
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.15);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    body.light-theme .add-card {
+      color: rgba(0, 0, 0, 0.6);
+    }
+    body.light-theme .add-card:hover {
+      color: rgba(0, 0, 0, 0.85);
+    }
+    body.light-theme .char-card:hover {
+      background: rgba(0, 0, 0, 0.08);
+      border-color: rgba(0, 0, 0, 0.25);
+    }
+    body.light-theme .header-title, body.light-theme .char-name {
+      text-shadow: none;
+      color: rgba(0, 0, 0, 0.85);
+    }
+    body.light-theme .slider-value-badge, body.light-theme .back-btn {
+      background: rgba(0,0,0,0.06);
+      border-color: rgba(0,0,0,0.12);
+      color: rgba(0,0,0,0.85);
+    }
+    body.light-theme .setting-row + .setting-row, body.light-theme .footer {
+      border-top: 1px solid rgba(0,0,0,0.1);
+    }
+    body.light-theme .style-select {
+      background: rgba(0, 0, 0, 0.05);
+      border-color: rgba(0, 0, 0, 0.15);
+      color: rgba(0, 0, 0, 0.85);
+    }
+    body.light-theme .style-select option {
+      background: #fff;
+      color: #000;
+    }
+    body.light-theme input[type=range] {
+      background: rgba(0,0,0,0.15);
+    }
+    body.light-theme input[type=range]::-webkit-slider-thumb {
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    body.light-theme .toggle-track {
+      background: rgba(0,0,0,0.15);
+      border-color: rgba(0,0,0,0.2);
+    }
+    body.light-theme kbd {
+      background: rgba(0,0,0,0.05);
+      border-color: rgba(0,0,0,0.15);
+      color: inherit;
+    }
+    body.light-theme .segmented-control {
+      background: rgba(0, 0, 0, 0.06);
+    }
+    body.light-theme .segment {
+      color: rgba(0, 0, 0, 0.6);
+    }
+    body.light-theme .segment.active {
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      color: #000;
+    }
+    body.light-theme .segment:hover:not(.active) {
+      background: rgba(0,0,0,0.04);
     }
 
     /* ─── Header ─────────────────────────────── */
@@ -33,7 +105,7 @@
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
       font-size: 13px;
-      transition: background 0.2s, transform 0.15s;
+      transition: background 0.2s, transform 0.15s, opacity 0.2s;
       flex-shrink: 0;
       margin-top: 8px;
     }
@@ -54,6 +126,39 @@
       padding: 4px 16px 20px;
     }
     ::-webkit-scrollbar { display: none; }
+
+    /* ─── Tabs ──────────────────────────────── */
+    .tabs-container {
+      display: flex;
+      justify-content: center;
+      padding: 0 16px 12px;
+      flex-shrink: 0;
+    }
+    .segmented-control {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 20px;
+      display: flex;
+      padding: 2px;
+      gap: 2px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .segment {
+      padding: 6px 16px;
+      border-radius: 18px;
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .segment.active {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    .segment:hover:not(.active) {
+      background: rgba(255,255,255,0.05);
+    }
 
     /* ─── Character Grid ─────────────────────── */
     .grid {
@@ -358,9 +463,17 @@
 
   <!-- ── HEADER ─────────────────────────────── -->
   <div class="header">
-    <div class="back-btn" id="back-btn" style="display:none">‹</div>
+    <div class="back-btn" id="back-btn" style="opacity: 0; pointer-events: none;">‹</div>
     <div class="header-title" id="header-title">My Pets</div>
     <div class="header-spacer" id="header-spacer"></div>
+  </div>
+
+  <!-- ── TABS ───────────────────────────────── -->
+  <div class="tabs-container" id="tabs-container">
+    <div class="segmented-control">
+      <div class="segment active" id="tab-chars">Персонажи</div>
+      <div class="segment" id="tab-app-settings">Настройки</div>
+    </div>
   </div>
 
   <!-- ── CONTENT AREA ───────────────────────── -->
@@ -368,7 +481,46 @@
     <!-- Grid View -->
     <div class="grid" id="char-grid"></div>
 
-    <!-- Settings Panel -->
+    <!-- App Settings (Global) -->
+    <div class="app-settings-panel" id="app-settings-panel" style="display: none; flex-direction: column; gap: 10px;">
+      
+      <div class="settings-card">
+        <div style="font-weight: 600; font-size: 13px; color: inherit; opacity: 0.6; margin-bottom: 4px; padding-top: 10px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">Внешний вид</div>
+        <div class="setting-row">
+          <div class="setting-icon">🎨</div>
+          <div class="setting-info">
+            <div class="setting-label">Тема оформления</div>
+            <div class="setting-description">Светлая или тёмная тема меню</div>
+          </div>
+          <select id="theme-select" class="style-select">
+            <option value="dark">Тёмная (Dark)</option>
+            <option value="light">Светлая (Light)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div style="font-weight: 600; font-size: 13px; color: inherit; opacity: 0.6; margin-bottom: 4px; padding-top: 10px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center;">Горячие клавиши</div>
+        <div class="setting-row">
+          <div class="setting-icon">👻</div>
+          <div class="setting-info">
+            <div class="setting-label">Сквозной клик</div>
+            <div class="setting-description">Нажимать сквозь персонажей</div>
+          </div>
+          <div class="slider-value-badge" style="font-size: 11px;">Cmd+Shift+I</div>
+        </div>
+        <div class="setting-row">
+          <div class="setting-icon">👁️</div>
+          <div class="setting-info">
+            <div class="setting-label">Скрыть / Показать</div>
+            <div class="setting-description">Включить/выключить персонажей</div>
+          </div>
+          <div class="slider-value-badge" style="font-size: 11px;">Cmd+Shift+H</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Char Settings Panel -->
     <div class="settings-panel" id="settings-panel">
       <div class="char-preview">
         <img id="settings-preview-img" src="" alt="">
@@ -618,16 +770,63 @@
     let currentEditChar = null;
 
     const grid = document.getElementById('char-grid');
+    const appSettingsPanel = document.getElementById('app-settings-panel');
     const settingsPanel = document.getElementById('settings-panel');
+    const tabsContainer = document.getElementById('tabs-container');
     const backBtn = document.getElementById('back-btn');
     const headerTitle = document.getElementById('header-title');
     const headerSpacer = document.getElementById('header-spacer');
+    
+    const tabChars = document.getElementById('tab-chars');
+    const tabAppSettings = document.getElementById('tab-app-settings');
+
+    tabChars.addEventListener('click', () => {
+      tabChars.classList.add('active');
+      tabAppSettings.classList.remove('active');
+      grid.style.display = 'grid';
+      appSettingsPanel.style.display = 'none';
+    });
+
+    tabAppSettings.addEventListener('click', () => {
+      tabAppSettings.classList.add('active');
+      tabChars.classList.remove('active');
+      grid.style.display = 'none';
+      appSettingsPanel.style.display = 'flex';
+    });
+
+    // ─── Theme Logic ─────────────────────────────────────────────────────────
+    const themeSelect = document.getElementById('theme-select');
+    function applyTheme(theme) {
+      if (theme === 'light') {
+        document.body.classList.add('light-theme');
+      } else {
+        document.body.classList.remove('light-theme');
+      }
+      ipcRenderer.send('set-theme', theme);
+      localStorage.setItem('app_theme', theme);
+    }
+    
+    // Load saved theme
+    const savedTheme = localStorage.getItem('app_theme') || 'dark';
+    themeSelect.value = savedTheme;
+    applyTheme(savedTheme);
+
+    themeSelect.addEventListener('change', (e) => {
+      applyTheme(e.target.value);
+    });
 
     function showGrid() {
-      grid.style.display = 'grid';
+      tabsContainer.style.display = 'flex';
+      if (tabChars.classList.contains('active')) {
+        grid.style.display = 'grid';
+        appSettingsPanel.style.display = 'none';
+      } else {
+        grid.style.display = 'none';
+        appSettingsPanel.style.display = 'flex';
+      }
       settingsPanel.classList.remove('visible');
-      backBtn.style.display = 'none';
-      headerSpacer.style.display = '';
+      backBtn.style.opacity = '0';
+      backBtn.style.pointerEvents = 'none';
       headerTitle.textContent = 'My Pets';
       currentEditChar = null;
     }
@@ -686,10 +885,12 @@
 
       document.getElementById('flip-toggle').checked = cfg.flipped === true;
 
+      tabsContainer.style.display = 'none';
       grid.style.display = 'none';
+      appSettingsPanel.style.display = 'none';
       settingsPanel.classList.add('visible');
-      backBtn.style.display = 'flex';
-      headerSpacer.style.display = 'none';
+      backBtn.style.opacity = '1';
+      backBtn.style.pointerEvents = 'auto';
       headerTitle.textContent = name;
     }
 

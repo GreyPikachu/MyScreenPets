@@ -4,6 +4,7 @@ const fs = require('fs');
 const logger = require('./logger');
 
 let petWindow;
+let isGhostMode = false;
 
 function toInt(val, fallback = 0) {
   const n = Math.round(Number(val));
@@ -63,6 +64,28 @@ app.whenReady().then(() => {
   logger.info('main', 'App ready, starting...');
   createPetWindow();
 
+  // ─── Global Shortcuts ──────────────────────────────────────────────────────
+  globalShortcut.register('CommandOrControl+Shift+I', () => {
+    if (petWindow) {
+      isGhostMode = !isGhostMode;
+      // When ghost mode is true, forward is false (completely click-through).
+      petWindow.setIgnoreMouseEvents(true, { forward: !isGhostMode });
+      logger.info('main', 'Toggled ghost mode', { isGhostMode });
+    }
+  });
+
+  globalShortcut.register('CommandOrControl+Shift+H', () => {
+    if (petWindow) {
+      if (petWindow.isVisible()) {
+        petWindow.hide();
+        logger.info('main', 'Hid pet window');
+      } else {
+        petWindow.showInactive();
+        logger.info('main', 'Showed pet window');
+      }
+    }
+  });
+
   setInterval(() => {
     if (petWindow && !petWindow.isDestroyed()) {
       try {
@@ -97,6 +120,10 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+
+app.on('will-quit', () => {
+  globalShortcut.unregisterAll();
 });
 
 ipcMain.on('move-window', (event, { x, y }) => {
@@ -206,6 +233,12 @@ function openMenuWindow() {
 }
 
 ipcMain.on('open-menu', openMenuWindow);
+
+ipcMain.on('set-theme', (event, theme) => {
+  if (menuWindow) {
+    menuWindow.setVibrancy(theme === 'light' ? 'popover' : 'hud');
+  }
+});
 
 ipcMain.on('select-character', (event, filename) => {
   logger.info('main', 'Character selected', { filename });
