@@ -16,7 +16,7 @@
     "idleBehavior": "lookAtCursor"
   },
   "flygon.gif": {
-    "scale": 1.75,
+    "scale": 2.5,
     "walking": true,
     "flipped": false,
     "walkStyle": "bounce",
@@ -50,7 +50,18 @@
   "gengar-gmax.gif": {
     "scale": 2.5,
     "walking": false,
-    "flipped": false
+    "flipped": false,
+    "walkStyle": "bounce",
+    "movementType": "ground",
+    "movementArea": 100,
+    "speedMultiplier": 1,
+    "pauseDuration": 2,
+    "activityLevel": 50,
+    "cursorReaction": "ignore",
+    "opacity": 100,
+    "shadow": "none",
+    "trail": "none",
+    "idleBehavior": "lookAtCursor"
   },
   "pikachu-cosplay.gif": {
     "scale": 1,
@@ -95,6 +106,22 @@
     "pauseDuration": 1,
     "activityLevel": 80,
     "cursorReaction": "ignore",
+    "opacity": 100,
+    "shadow": "none",
+    "trail": "none",
+    "idleBehavior": "static"
+  },
+  "skarmory.gif": {
+    "scale": 1.75,
+    "walking": true,
+    "flipped": false,
+    "walkStyle": "glide",
+    "movementType": "free-roam",
+    "movementArea": 100,
+    "speedMultiplier": 1,
+    "pauseDuration": 2,
+    "activityLevel": 50,
+    "cursorReaction": "avoid",
     "opacity": 100,
     "shadow": "none",
     "trail": "none",
