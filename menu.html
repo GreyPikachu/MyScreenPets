@@ -833,6 +833,7 @@
 
     function showSettingsFor(filename) {
       currentEditChar = filename;
+      ipcRenderer.send('select-character', filename);
       const name = path.parse(filename).name;
       const cfg = getCharSettings(filename);
 

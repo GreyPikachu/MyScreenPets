@@ -318,7 +318,9 @@ ipcRenderer.on('change-character', (event, { filename, cfg }) => {
 });
 
 ipcRenderer.on('apply-char-settings', (event, changes) => {
-  if (changes.filename && changes.filename !== currentCharacter) return;
+  if (changes.filename && changes.filename !== currentCharacter) {
+    currentCharacter = changes.filename;
+  }
   rlog('INFO', 'Settings applied from menu', changes);
   applyCharSettings(changes);
   setState(state); // re-apply class & facing

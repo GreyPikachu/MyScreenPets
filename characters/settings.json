@@ -1,12 +1,12 @@
 {
   "Pikachu.gif": {
-    "scale": 1,
+    "scale": 1.1,
     "walking": true,
     "flipped": false,
     "walkStyle": "bounce",
     "movementType": "free-roam",
     "movementArea": 100,
-    "speedMultiplier": 1,
+    "speedMultiplier": 1.75,
     "pauseDuration": 2,
     "activityLevel": 50,
     "cursorReaction": "avoid",
@@ -16,7 +16,7 @@
     "idleBehavior": "lookAtCursor"
   },
   "flygon.gif": {
-    "scale": 2.5,
+    "scale": 1.65,
     "walking": true,
     "flipped": false,
     "walkStyle": "bounce",
@@ -32,9 +32,20 @@
     "idleBehavior": "static"
   },
   "gengar.gif": {
-    "scale": 1.4,
+    "scale": 1.35,
     "walking": true,
-    "flipped": false
+    "flipped": false,
+    "walkStyle": "bounce",
+    "movementType": "free-roam",
+    "movementArea": 100,
+    "speedMultiplier": 2.25,
+    "pauseDuration": 2,
+    "activityLevel": 50,
+    "cursorReaction": "avoid",
+    "opacity": 100,
+    "shadow": "drop",
+    "trail": "none",
+    "idleBehavior": "static"
   },
   "gengar-mega.gif": {
     "scale": 1.6,
@@ -122,6 +133,22 @@
     "pauseDuration": 2,
     "activityLevel": 50,
     "cursorReaction": "avoid",
+    "opacity": 100,
+    "shadow": "none",
+    "trail": "none",
+    "idleBehavior": "static"
+  },
+  "vivillon-garden.gif": {
+    "scale": 1,
+    "walking": true,
+    "flipped": false,
+    "walkStyle": "bounce",
+    "movementType": "free-roam",
+    "movementArea": 100,
+    "speedMultiplier": 2.5,
+    "pauseDuration": 2,
+    "activityLevel": 50,
+    "cursorReaction": "curious",
     "opacity": 100,
     "shadow": "none",
     "trail": "none",

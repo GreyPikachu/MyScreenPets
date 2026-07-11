@@ -35,6 +35,17 @@ function createPetWindow() {
 
   petWindow.loadFile('index.html');
   
+  petWindow.webContents.on('did-finish-load', () => {
+    const defaultFilename = 'Pikachu.gif';
+    const settingsPath = path.join(__dirname, 'characters', 'settings.json');
+    let cfg = { scale: 1.0, walking: true, flipped: false, walkStyle: 'bounce', movementType: 'ground', movementArea: 100, speedMultiplier: 1.0, pauseDuration: 2, activityLevel: 50, cursorReaction: 'ignore', opacity: 100, shadow: 'none', trail: 'none', idleBehavior: 'static' };
+    try {
+      const all = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+      cfg = { ...cfg, ...(all[defaultFilename] || {}) };
+    } catch {}
+    petWindow.webContents.send('change-character', { filename: defaultFilename, cfg });
+  });
+  
   // Make the transparent area click-through
   petWindow.setIgnoreMouseEvents(true, { forward: true });
   
